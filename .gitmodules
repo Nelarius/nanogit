@@ -1,0 +1,3 @@
+[submodule "extern/common"]
+	path = extern/common
+	url = https://github.com/Nelarius/common.git
