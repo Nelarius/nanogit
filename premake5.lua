@@ -12,7 +12,7 @@ workspace "nanogit"
 
     filter "configurations:Debug"
         defines "NLRS_DEBUG"
-        flags "Symbols"
+        symbols "On"
 
     filter "configurations:Release"
         defines "NDEBUG"
@@ -38,20 +38,16 @@ workspace "nanogit"
 
     group "extern"
 
-    project "imgui"
-        kind "StaticLib"
-        language "C++"
-        targetdir "lib"
-        files { "extern/imgui/**.cpp", "extern/imgui/**.h" }
-        includedirs { "extern", "extern/common/extern/gl3w/include", "extern/SDL/include" }
-
     project "nanovg"
         kind "StaticLib"
         language "C"
         targetdir "lib"
-        disablewarnings "4267"
         files { "extern/nanovg/**.c", "extern/nanovg/**.h" }
         includedirs { "extern/common/extern", "extern/nanovg", "extern/common/extern/gl3w/include" }
+        filter "toolset:msc"
+            disablewarnings "4267"
+        filter "toolset:clang or toolset:gcc"
+            disablewarnings "constant-conversion"
 
     project_gl3w("extern")
 
