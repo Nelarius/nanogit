@@ -4,98 +4,32 @@
 #include "nanovg.h"
 #define NANOVG_GL3_IMPLEMENTATION
 #include "nanovg_gl.h"
-
-void drawEditBoxBase(NVGcontext* vg, float x, float y, float w, float h)
-{
-    NVGpaint bg;
-    // Edit
-    bg = nvgBoxGradient(vg, x + 1, y + 1 + 1.5f, w - 2, h - 2, 3, 4, nvgRGBA(255, 255, 255, 32), nvgRGBA(32, 32, 32, 32));
-    nvgBeginPath(vg);
-    nvgRoundedRect(vg, x + 1, y + 1, w - 2, h - 2, 4 - 1);
-    nvgFillPaint(vg, bg);
-    nvgFill(vg);
-
-    nvgBeginPath(vg);
-    nvgRoundedRect(vg, x + 0.5f, y + 0.5f, w - 1, h - 1, 4 - 0.5f);
-    nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 48));
-    nvgStroke(vg);
-}
-
-void drawEditBox(NVGcontext* vg, const char* text, float x, float y, float w, float h)
-{
-
-    drawEditBoxBase(vg, x, y, w, h);
-
-    nvgFontSize(vg, 20.0f);
-    nvgFontFace(vg, "sans");
-    nvgFillColor(vg, nvgRGBA(255, 255, 255, 64));
-    nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
-    nvgText(vg, x + h*0.3f, y + h*0.5f, text, NULL);
-}
-
-void drawWindow(NVGcontext* vg, const char* title, float x, float y, float w, float h)
-{
-    float cornerRadius = 3.0f;
-    NVGpaint shadowPaint;
-    NVGpaint headerPaint;
-
-    nvgSave(vg);
-    //	nvgClearState(vg);
-
-    // Window
-    nvgBeginPath(vg);
-    nvgRoundedRect(vg, x, y, w, h, cornerRadius);
-    nvgFillColor(vg, nvgRGBA(28, 30, 34, 192));
-    //	nvgFillColor(vg, nvgRGBA(0,0,0,128));
-    nvgFill(vg);
-
-    // Drop shadow
-    shadowPaint = nvgBoxGradient(vg, x, y + 2, w, h, cornerRadius * 2, 10, nvgRGBA(0, 0, 0, 128), nvgRGBA(0, 0, 0, 0));
-    nvgBeginPath(vg);
-    nvgRect(vg, x - 10, y - 10, w + 20, h + 30);
-    nvgRoundedRect(vg, x, y, w, h, cornerRadius);
-    nvgPathWinding(vg, NVG_HOLE);
-    nvgFillPaint(vg, shadowPaint);
-    nvgFill(vg);
-
-    // Header
-    headerPaint = nvgLinearGradient(vg, x, y, x, y + 15, nvgRGBA(255, 255, 255, 8), nvgRGBA(0, 0, 0, 16));
-    nvgBeginPath(vg);
-    nvgRoundedRect(vg, x + 1, y + 1, w - 2, 30, cornerRadius - 1);
-    nvgFillPaint(vg, headerPaint);
-    nvgFill(vg);
-    nvgBeginPath(vg);
-    nvgMoveTo(vg, x + 0.5f, y + 0.5f + 30);
-    nvgLineTo(vg, x + 0.5f + w - 1, y + 0.5f + 30);
-    nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 32));
-    nvgStroke(vg);
-
-    nvgFontSize(vg, 18.0f);
-    nvgFontFace(vg, "sans-bold");
-    nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-
-    nvgFontBlur(vg, 2);
-    nvgFillColor(vg, nvgRGBA(0, 0, 0, 128));
-    nvgText(vg, x + w / 2, y + 16 + 1, title, NULL);
-
-    nvgFontBlur(vg, 0);
-    nvgFillColor(vg, nvgRGBA(220, 220, 220, 160));
-    nvgText(vg, x + w / 2, y + 16, title, NULL);
-
-    nvgRestore(vg);
-}
+#undef max
+#undef min
+#undef near
+#undef far
 
 namespace nlrs
 {
 
-Screen::Screen()
-    : Widget(nullptr),
+Screen::Screen(IAllocator& allocator)
+    : Widget(nullptr, allocator),
     context_(nullptr)
 {}
 
 Screen::~Screen()
 {
-    nvgDeleteGL3(context_);
+    if (context_)
+    {
+        nvgDeleteGL3(context_);
+    }
+}
+
+Screen::Screen(Screen&& other)
+    : Widget(nullptr, other.allocator_),
+    context_(other.context_)
+{
+    other.context_ = nullptr;
 }
 
 bool Screen::initialize(Vec2i windowSize)
@@ -110,8 +44,16 @@ bool Screen::initialize(Vec2i windowSize)
     return true;
 }
 
+NVGcontext* Screen::context()
+{
+    NLRS_ASSERT(context_);
+    return context_;
+}
+
 void Screen::onRender()
 {
+    NLRS_ASSERT(context_);
+
     nvgBeginFrame(context_, size_.x, size_.y, float(size_.x) / size_.y);
 
     for (auto child : children_)
@@ -119,17 +61,31 @@ void Screen::onRender()
         child->onRender();
     }
 
-    drawWindow(context_, "Widgets `n Stuff", 50, 50, 300, 400);
-    drawEditBox(context_, "Email", 50, 50, 280, 28);
-    drawEditBox(context_, "Password", 50, 85, 280, 28);
-    nvgRestore(context_);
+    /*const char* txt = "Text me up with some text.";
+
+    Vec4f bounds{};
+
+    nvgFontFace(context_, "sans-bold");
+    nvgFontSize(context_, 32.f);
+
+    nvgTextBoxBounds(context_, 150.f, 100.f, 350.f, txt, nullptr, &bounds.x);
+    nvgFillColor(context_, nvgRGB(150, 250, 250));
+    nvgBeginPath(context_);
+    nvgRoundedRect(context_, bounds.x, bounds.y, bounds.z - bounds.x, bounds.w - bounds.y, 10.f);
+    nvgFill(context_);
+
+    nvgFillColor(context_, nvgRGB(32, 64, 128 ));
+    nvgText(context_, 150.f, 100.f, txt, nullptr);*/
 
     nvgEndFrame(context_);
 }
 
 void Screen::onResize(Vec2i newSize)
 {
+    NLRS_ASSERT(context_);
+
     size_ = newSize;
 }
+
 
 }

@@ -4,6 +4,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <utility>
 
 namespace nlrs
 {
@@ -127,13 +128,16 @@ Repository::Repository(const char* pathToRepository)
     constructLog_();
 }
 
+Repository::Repository(Repository&& other)
+    : repository_(other.repository_),
+    log_(std::move(other.log_))
+{
+    other.repository_ = nullptr;
+}
+
 Repository::~Repository()
 {
-    if (repository_)
-    {
-        git_repository_free(repository_);
-        repository_ = nullptr;
-    }
+    close();
 }
 
 void Repository::close()
@@ -193,6 +197,15 @@ std::string Repository::commitDiff(const LogEntry& entry) const
     checkError(git_diff_tree_to_tree(&diff, repository_, parentTree, commitTree, nullptr), "Failed to diff tree objects: ");
 
     // TODO: diff leaks memory, it should be freed
+
+    return diffToString(diff);
+}
+
+std::string Repository::diffIndexToWorkDir() const
+{
+    git_diff* diff = nullptr;
+
+    checkError(git_diff_index_to_workdir(&diff, repository_, nullptr, nullptr), "Failed to construct diff between index and work dir: ");
 
     return diffToString(diff);
 }

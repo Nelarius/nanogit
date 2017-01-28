@@ -32,8 +32,11 @@ public:
     };
 
     explicit Repository(const char*);
-    Repository() = delete;
+    Repository(Repository&&);
     ~Repository();
+
+    Repository() = delete;
+
 
     void close();
 
@@ -44,6 +47,8 @@ public:
     std::string diff() const;
 
     std::string commitDiff(const LogEntry& entry) const;
+
+    std::string diffIndexToWorkDir() const;
 
 private:
     void constructLog_();

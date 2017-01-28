@@ -1,5 +1,6 @@
 #pragma once
 
+#include "nlrsAllocator.h"
 #include "nlrsVector.h"
 #include "nlrsWidget.h"
 
@@ -11,14 +12,20 @@ namespace nlrs
 class Screen : public Widget
 {
 public:
-    Screen();
-    ~Screen();
+    Screen() = default;
+    explicit Screen(IAllocator& allocator);
+    Screen(Screen&&);
+    virtual ~Screen();
 
-    bool initialize(Vec2i windowSize); // TODO: this should return false on failure to initialize nanovg
+    Screen(const Screen&) = delete;
+    Screen& operator=(Screen&&) = delete;
+    Screen& operator=(const Screen&) = delete;
+
+    bool initialize(Vec2i windowSize);
+    void onResize(Vec2i newSize);
 
     void onRender() override;
-
-    void onResize(Vec2i newSize);
+    NVGcontext* context() override;
 
 private:
     NVGcontext* context_;

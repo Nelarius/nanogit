@@ -1,11 +1,14 @@
+#include "core/nlrsMouse.h"
+#include "core/nlrsRepository.h"
+#include "core/nlrsApp.h"
+#include "gui/nlrsScreen.h"
 #include "nlrsAllocator.h"
 #include "nlrsLog.h"
-#include "gui/nlrsScreen.h"
-#include "core/nlrsMouse.h"
 #include "nlrsRenderer.h"
 #include "nlrsWindow.h"
 
 #include "SDL_events.h"
+#include "git2.h"
 
 #include <cstdlib>
 
@@ -17,6 +20,8 @@ using nlrs::u32;
 
 int main(int argc, char** argv)
 {
+    git_libgit2_init();
+
     /***
     *       _______  __       _      ___         __             _      _ __
     *      / __/ _ \/ /      | | /| / (_)__  ___/ /__ _    __  (_)__  (_) /_
@@ -57,6 +62,15 @@ int main(int argc, char** argv)
         NLRS_ASSERT(nlrs::HeapAllocatorLocator::get() != nlrs::SystemAllocatorLocator::get());
 
         /***
+        *       ___                    _ __                  _      _ __
+        *      / _ \___ ___  ___  ___ (_) /____  ______ __  (_)__  (_) /_
+        *     / , _/ -_) _ \/ _ \(_-</ / __/ _ \/ __/ // / / / _ \/ / __/
+        *    /_/|_|\__/ .__/\___/___/_/\__/\___/_/  \_, / /_/_//_/_/\__/
+        *            /_/                           /___/
+        */
+        nlrs::Repository repository("..");
+
+        /***
         *       ___              __                  _      _ __
         *      / _ \___ ___  ___/ /__ _______ ____  (_)__  (_) /_
         *     / , _/ -_) _ \/ _  / -_) __/ -_) __/ / / _ \/ / __/
@@ -76,14 +90,14 @@ int main(int argc, char** argv)
         nlrs::RendererLocator::set(&renderer);
 
         /***
-        *      _______  ______  _      _ __
-        *     / ___/ / / /  _/ (_)__  (_) /_
-        *    / (_ / /_/ // /  / / _ \/ / __/
-        *    \___/\____/___/ /_/_//_/_/\__/
-        *
+        *       ___               _      _ __
+        *      / _ | ___  ___    (_)__  (_) /_
+        *     / __ |/ _ \/ _ \  / / _ \/ / __/
+        *    /_/ |_/ .__/ .__/ /_/_//_/_/\__/
+        *         /_/  /_/
         */
-        nlrs::Screen screen;
-        if (!screen.initialize(nlrs::Vec2i(WINDOW_WIDTH, WINDOW_HEIGHT)))
+        nlrs::App app;
+        if (!app.initialize())
         {
             return -1;
         }
@@ -110,11 +124,17 @@ int main(int argc, char** argv)
                 mouse.handleEvent(event);
             }
 
-            screen.onRender();
+            app.update();
+
+            renderer.clearBuffers();
+
+            app.render();
 
             renderer.swapBuffers();
         }
     }
+
+    git_libgit2_shutdown();
 
     return 0;
 }
