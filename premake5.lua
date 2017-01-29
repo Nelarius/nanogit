@@ -57,6 +57,14 @@ workspace "nanogit"
 
     project_test("extern")
 
+    --[[
+                    
+    _______  _______ 
+    / __/ _ \/ __/ -_)
+    \__/\___/_/  \__/ 
+                    
+    --]]
+
     group "core"
 
     project "nanogit"
@@ -72,6 +80,8 @@ workspace "nanogit"
             "extern/common/include"
         }
         links { "gl3w", "nanovg", "window", "common" }
+
+        postbuildcommands { "{COPY} ../../resources/* %{cfg.targetdir}" }
 
         filter "system:macosx"
             includedirs { "/Library/Frameworks/SDL2.framework/Headers" }
