@@ -43,9 +43,9 @@ bool App::initialize()
     screen_.addChild(textBox);
 
     textBox->setFont(handle);
-    textBox->setFontSize(32.f);
-    textBox->setText("Hello, world");
-    //textBox->setText(repository_.diffIndexToWorkDir().c_str());
+    textBox->setFontSize(18.f);
+    textBox->setMargin(50);
+    textBox->setText(repository_.diffIndexToWorkDir().c_str());
 
     return true;
 }

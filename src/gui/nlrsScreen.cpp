@@ -50,6 +50,11 @@ NVGcontext* Screen::context()
     return context_;
 }
 
+Bounds2i Screen::size() const
+{
+    return Bounds2i({0, 0}, {size_.x, size_.y});
+}
+
 void Screen::onRender()
 {
     NLRS_ASSERT(context_);
@@ -60,22 +65,6 @@ void Screen::onRender()
     {
         child->onRender();
     }
-
-    /*const char* txt = "Text me up with some text.";
-
-    Vec4f bounds{};
-
-    nvgFontFace(context_, "sans-bold");
-    nvgFontSize(context_, 32.f);
-
-    nvgTextBoxBounds(context_, 150.f, 100.f, 350.f, txt, nullptr, &bounds.x);
-    nvgFillColor(context_, nvgRGB(150, 250, 250));
-    nvgBeginPath(context_);
-    nvgRoundedRect(context_, bounds.x, bounds.y, bounds.z - bounds.x, bounds.w - bounds.y, 10.f);
-    nvgFill(context_);
-
-    nvgFillColor(context_, nvgRGB(32, 64, 128 ));
-    nvgText(context_, 150.f, 100.f, txt, nullptr);*/
 
     nvgEndFrame(context_);
 }
