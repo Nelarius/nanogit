@@ -50,7 +50,7 @@ NVGcontext* Screen::context()
     return context_;
 }
 
-Bounds2i Screen::size() const
+Bounds2i Screen::bounds() const
 {
     return Bounds2i({0, 0}, {size_.x, size_.y});
 }

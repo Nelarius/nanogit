@@ -37,14 +37,11 @@ bool App::initialize()
 
     IAllocator& allocator = SystemAllocator::getInstance();
 
-    void* mem = allocator.allocate(sizeof(TextBox), alignof(TextBox));
-    auto* textBox = new (mem) TextBox(&screen_, allocator);
-
-    screen_.addChild(textBox);
+    TextBox* textBox = screen_.addChild<TextBox>();
 
     textBox->setFont(handle);
     textBox->setFontSize(18.f);
-    textBox->setMargin(50);
+    textBox->setMargin(100);
     textBox->setText(repository_.diffIndexToWorkDir().c_str());
 
     return true;

@@ -18,10 +18,23 @@ public:
     virtual void onRender() = 0;
     // the default implementation just returns the parent's context
     virtual NVGcontext* context();
-    // the default implementation offsets the parent's size
-    virtual Bounds2i size() const;
 
-    void addChild(Widget* child);
+    // the screen space bounds
+    // the default implementation offsets the parent's bounds according to the
+    // margin & padding
+    virtual Bounds2i bounds() const;
+
+    template<typename T>
+    T* addChild()
+    {
+        void* mem = allocator_.allocate(sizeof(T), sizeof(T));
+        T* widget = new (mem) T(static_cast<Widget*>(this), allocator_);
+
+        children_.pushBack(widget);
+
+        return widget;
+    }
+
     void setMargin(int margin);
     void setBorder(int border);
     void setPadding(int padding);

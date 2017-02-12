@@ -24,11 +24,6 @@ Widget::~Widget()
     freeChildren_();
 }
 
-void Widget::addChild(Widget* child)
-{
-    children_.pushBack(child);
-}
-
 void Widget::setMargin(int margin)
 {
     if (margin < 0)
@@ -66,10 +61,10 @@ NVGcontext* Widget::context()
     return parent_->context();
 }
 
-Bounds2i Widget::size() const
+Bounds2i Widget::bounds() const
 {
     // TODO: validate the calculated size
-    auto bounds = parent_->size();
+    auto bounds = parent_->bounds();
     return Bounds2i({bounds.min.x + margin_, bounds.min.y + margin_}, {bounds.max.x - margin_, bounds.max.y - margin_});
 }
 
