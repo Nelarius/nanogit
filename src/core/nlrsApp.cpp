@@ -1,6 +1,7 @@
 #include "nlrsApp.h"
 #include "nlrsAllocator.h"
 #include "nlrsWindow.h"
+#include "gui/nlrsScrollPanel.h"
 #include "gui/nlrsTextBox.h"
 
 #include <utility>
@@ -37,11 +38,15 @@ bool App::initialize()
 
     IAllocator& allocator = SystemAllocator::getInstance();
 
-    TextBox* textBox = screen_.addChild<TextBox>();
+    ScrollPanel* scrollPanel = screen_.addChild<ScrollPanel>();
+    scrollPanel->setMargin(50);
+    scrollPanel->setRadius(5.f);
+    scrollPanel->setFeather(5.f);
+    scrollPanel->setScrollBarWidth(16);
+    TextBox* textBox = scrollPanel->addChild<TextBox>();
 
     textBox->setFont(handle);
     textBox->setFontSize(18.f);
-    textBox->setMargin(100);
     textBox->setText(repository_.diffIndexToWorkDir().c_str());
 
     return true;
