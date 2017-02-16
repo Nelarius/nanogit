@@ -1,5 +1,6 @@
-#include "nlrsApp.h"
 #include "nlrsAllocator.h"
+#include "nlrsApp.h"
+#include "nlrsMouse.h"
 #include "nlrsWindow.h"
 #include "gui/nlrsScrollPanel.h"
 #include "gui/nlrsTextBox.h"
@@ -38,8 +39,8 @@ bool App::initialize()
 
     IAllocator& allocator = SystemAllocator::getInstance();
 
+    screen_.setPadding(50);
     ScrollPanel* scrollPanel = screen_.addChild<ScrollPanel>();
-    scrollPanel->setMargin(50);
     scrollPanel->setRadius(5.f);
     scrollPanel->setFeather(5.f);
     scrollPanel->setScrollBarWidth(16);
@@ -48,6 +49,17 @@ bool App::initialize()
     textBox->setFont(handle);
     textBox->setFontSize(18.f);
     textBox->setText(repository_.diffIndexToWorkDir().c_str());
+
+    Mouse& mouse = *MouseLocator::get();
+    mouse.listenToButtonDown([this](Mouse::Button button, Vec2i coords) -> void {
+        screen_.onMouseButton(button, Mouse::Event::ButtonDown, coords);
+    });
+    mouse.listenToButtonUp([this](Mouse::Button button, Vec2i coords) -> void {
+        screen_.onMouseButton(button, Mouse::Event::ButtonUp, coords);
+    });
+    mouse.listenToScroll([this](i32 delta, Vec2i coords) -> void {
+        screen_.onMouseScroll(delta, coords);
+    });
 
     return true;
 }

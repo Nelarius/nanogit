@@ -1,6 +1,5 @@
 #pragma once
 
-#include "nlrsArray.h"
 #include "nlrsGeometry.h"
 #include "core/nlrsMouse.h"
 
@@ -16,13 +15,15 @@ public:
     virtual ~Widget();
 
     virtual void onRender() = 0;
+    virtual void onMouseButton(Mouse::Button button, Mouse::Event event, Vec2i coordinates);
+    virtual void onMouseScroll(i32 delta, Vec2i coordinates);
     // the default implementation just returns the parent's context
     virtual NVGcontext* context();
 
-    // the screen space bounds
-    // the default implementation offsets the parent's bounds according to the
-    // margin & padding
-    virtual Bounds2i bounds() const;
+    // the screen space bounds of the widget content
+    // the default implementation offsets the parent's content bounds
+    // by this widget's margin, padding, and border
+    virtual Bounds2i contentBounds() const;
 
     template<typename T>
     T* addChild()
@@ -30,7 +31,7 @@ public:
         void* mem = allocator_.allocate(sizeof(T), sizeof(T));
         T* widget = new (mem) T(static_cast<Widget*>(this), allocator_);
 
-        children_.pushBack(widget);
+        child_ = widget;
 
         return widget;
     }
@@ -40,12 +41,12 @@ public:
     void setPadding(int padding);
 
 protected:
-    void freeChildren_();
+    void freeChild();
 
     IAllocator& allocator_;
     Widget* parent_;
+    Widget* child_;
     NVGcontext* context_;
-    StaticArray<Widget*, 8u> children_;
 
     // element information
     int margin_;

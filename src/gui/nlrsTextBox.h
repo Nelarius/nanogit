@@ -13,14 +13,17 @@ class TextBox : public Widget
 public:
     TextBox(Widget* parent, IAllocator& allocator)
         : Widget(parent, allocator),
-        text_(""),
+        text_(),
         font_(FontManager::InvalidHandle),
-        fontSize_(24.f)
+        fontSize_(24.f),
+        contentBounds_()
     {}
 
     virtual ~TextBox() = default;
 
     void onRender() override;
+
+    Bounds2i contentBounds() const override;
 
     void setText(const char* text);
     void setFont(FontManager::Handle font);
@@ -30,6 +33,8 @@ private:
     std::string text_;
     FontManager::Handle font_;
     float fontSize_;
+
+    Bounds2i contentBounds_;
 };
 
 }

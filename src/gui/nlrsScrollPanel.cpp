@@ -1,4 +1,6 @@
 #include "nlrsScrollPanel.h"
+#include "nlrsLog.h"
+#include "nlrsMath.h"
 #include "nanovg.h"
 
 namespace nlrs
@@ -6,7 +8,7 @@ namespace nlrs
 
 void ScrollPanel::onRender()
 {
-    Bounds2i b = bounds();
+    Bounds2i b = contentBounds();
     Vec2i extent = b.extent();
 
     float x = float(b.min.x);
@@ -15,6 +17,8 @@ void ScrollPanel::onRender()
     float h = float(extent.y);
 
     // render the scroll bar
+
+    // TODO: expose the color of the scroll bar as external parameter
     NVGpaint paint = nvgBoxGradient(
         context_, x + w - scrollBarWidth_ + 1.f, y + 1.f, scrollBarWidth_ + 1.f,
         h, radius_, feather_, nvgRGB(128, 128, 128), nvgRGB(64, 64, 64));
@@ -24,11 +28,16 @@ void ScrollPanel::onRender()
     nvgFillPaint(context_, paint);
     nvgFill(context_);
 
-    // TODO: calculate scrollh
-    float scrollh = 0.f;
+    float scrollh = h;
+    if (child_)
+    {
+        float childHeight = child_->contentBounds().extent().cast<float>().y;
+        scrollh = h * (h / childHeight);
+    }
+
     paint = nvgBoxGradient(
         context_, x + w - scrollBarWidth_ - 1.f, y + (h - scrollh) * scrollPosition_,
-        scrollBarWidth_, scrollh, radius_, feather_, nvgRGB(220, 220, 220), nvgRGB(128, 128, 128));
+        float(scrollBarWidth_), scrollh, radius_, feather_, nvgRGB(220, 220, 220), nvgRGB(128, 128, 128));
     nvgBeginPath(context_);
     nvgRoundedRect(
         context_, x + w - float(scrollBarWidth_) + 1.f, y + 1.f + (h - scrollh) * scrollPosition_,
@@ -42,12 +51,23 @@ void ScrollPanel::onRender()
 
     nvgScissor(context_, x, y, w - scrollBarWidth_, h);
 
-    for (auto* child : children_)
+    if (child_)
     {
-        child->onRender();
+        auto b = child_->contentBounds();
+        float childHeight = b.extent().cast<float>().y + 0.5f * contentBounds().extent().y;
+
+        nvgTranslate(context_, 0.f, -childHeight * scrollPosition_);
     }
 
+    child_->onRender();
+
     nvgRestore(context_);
+}
+
+void ScrollPanel::onMouseScroll(i32 delta, Vec2i coordinates)
+{
+    // TODO: scale scroll factor by child content height
+    scrollPosition_ = clamp(scrollPosition_ + 0.02f * -delta, 0.f, 1.f);
 }
 
 }

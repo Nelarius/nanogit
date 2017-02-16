@@ -35,7 +35,11 @@ Screen::Screen(Screen&& other)
 bool Screen::initialize(Vec2i windowSize)
 {
     size_ = windowSize;
+#ifdef NLRS_DEBUG
     context_ = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+#else
+    context_ = nvgCreateGLw3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+#endif
     if (!context_)
     {
         return false;
@@ -50,9 +54,9 @@ NVGcontext* Screen::context()
     return context_;
 }
 
-Bounds2i Screen::bounds() const
+Bounds2i Screen::contentBounds() const
 {
-    return Bounds2i({0, 0}, {size_.x, size_.y});
+    return Bounds2i({0, 0}, {size_.x, size_.y}).shrink(padding_);
 }
 
 void Screen::onRender()
@@ -61,10 +65,7 @@ void Screen::onRender()
 
     nvgBeginFrame(context_, size_.x, size_.y, float(size_.x) / size_.y);
 
-    for (auto child : children_)
-    {
-        child->onRender();
-    }
+    child_->onRender();
 
     nvgEndFrame(context_);
 }
@@ -75,6 +76,5 @@ void Screen::onResize(Vec2i newSize)
 
     size_ = newSize;
 }
-
 
 }

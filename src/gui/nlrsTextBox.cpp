@@ -3,6 +3,8 @@
 #include "fs/nlrsFileSystem.h"
 #include "nanovg.h"
 
+#include <cmath>
+
 namespace nlrs
 {
 
@@ -14,7 +16,7 @@ void TextBox::onRender()
     // TODO: fill color should be a property
     nvgFillColor(context_, nvgRGB(224, 224, 224));
 
-    auto b = bounds();
+    auto b = contentBounds_;
     auto extent = b.extent();
 
     float lineHeight = fontSize_;
@@ -40,9 +42,37 @@ void TextBox::onRender()
     }
 }
 
+Bounds2i TextBox::contentBounds() const
+{
+    if (text_.length() == 0)
+    {
+        return parent_->contentBounds();
+    }
+    else
+    {
+        return contentBounds_;
+    }
+}
+
 void TextBox::setText(const char* text)
 {
     text_ = text;
+
+    Bounds2f fbounds = parent_->contentBounds().cast<float>();
+    fbounds.shrink(float(padding_ + margin_ + border_));
+    Vec2f extent = fbounds.extent();
+
+    const char* start = text_.c_str();
+    const char* end = start + text_.length();
+
+    nvgTextBoxBounds(context_, fbounds.min.x, fbounds.min.y, extent.x, start, end, &fbounds.min.x);
+
+    contentBounds_ = Bounds2i(
+        Vec2i{i32(std::ceil(fbounds.min.x)), i32(std::ceil(fbounds.min.y))},
+        Vec2i{i32(std::ceil(fbounds.max.x)), i32(std::ceil(fbounds.max.y))}
+    );
+
+    contentBounds_ = contentBounds_.shrink(i32(padding_ + margin_ + border_));
 }
 
 void TextBox::setFont(FontManager::Handle handle)

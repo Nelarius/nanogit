@@ -90,6 +90,16 @@ int main(int argc, char** argv)
         nlrs::RendererLocator::set(&renderer);
 
         /***
+        *       ________       __         _           _      _ __
+        *      /  _/ __ \  ___/ /__ _  __(_)______   (_)__  (_) /_
+        *     _/ // /_/ / / _  / -_) |/ / / __/ -_) / / _ \/ / __/
+        *    /___/\____/  \_,_/\__/|___/_/\__/\__/ /_/_//_/_/\__/
+        *
+        */
+        nlrs::Mouse mouse;
+        nlrs::MouseLocator::set(&mouse);
+
+        /***
         *       ___               _      _ __
         *      / _ | ___  ___    (_)__  (_) /_
         *     / __ |/ _ \/ _ \  / / _ \/ / __/
@@ -109,10 +119,11 @@ int main(int argc, char** argv)
         *    /_/  /_/\_,_/_/_//_/ /_/\___/\___/ .__/
         *                                    /_/
         */
-        nlrs::Mouse mouse;
+
         bool running = true;
         while (running)
         {
+            mouse.update(); // updates mouse coordinates
             SDL_Event event;
             while (SDL_PollEvent(&event))
             {

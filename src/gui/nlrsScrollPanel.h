@@ -13,12 +13,13 @@ public:
         scrollBarWidth_(12),
         feather_(4.f),
         radius_(3.f),
-        scrollPosition_(0.2f)
+        scrollPosition_(0.0f)
     {}
 
     virtual ~ScrollPanel() = default;
 
     void onRender() override;
+    void onMouseScroll(i32 delta, Vec2i coordinates) override;
 
     inline void setScrollBarWidth(i32 width)
     {

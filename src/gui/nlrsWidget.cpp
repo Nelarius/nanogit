@@ -8,7 +8,7 @@ namespace nlrs
 Widget::Widget(Widget* parent, IAllocator& allocator)
     : allocator_(allocator),
     parent_(parent),
-    children_(),
+    child_(nullptr),
     margin_(0),
     border_(0),
     padding_(0)
@@ -21,7 +21,30 @@ Widget::Widget(Widget* parent, IAllocator& allocator)
 
 Widget::~Widget()
 {
-    freeChildren_();
+    // TODO: use smart pointer here
+    freeChild();
+}
+
+void Widget::onMouseButton(Mouse::Button button, Mouse::Event event, Vec2i coordinates)
+{
+    if (contentBounds().contains(coordinates))
+    {
+        if (child_)
+        {
+            child_->onMouseButton(button, event, coordinates);
+        }
+    }
+}
+
+void Widget::onMouseScroll(i32 delta, Vec2i coordinates)
+{
+    if (contentBounds().contains(coordinates))
+    {
+        if (child_)
+        {
+            child_->onMouseScroll(delta, coordinates);
+        }
+    }
 }
 
 void Widget::setMargin(int margin)
@@ -61,19 +84,19 @@ NVGcontext* Widget::context()
     return parent_->context();
 }
 
-Bounds2i Widget::bounds() const
+Bounds2i Widget::contentBounds() const
 {
     // TODO: validate the calculated size
-    auto bounds = parent_->bounds();
-    return Bounds2i({bounds.min.x + margin_, bounds.min.y + margin_}, {bounds.max.x - margin_, bounds.max.y - margin_});
+    auto bounds = parent_->contentBounds();
+    return bounds.shrink(i32(margin_ + border_ + padding_));
 }
 
-void Widget::freeChildren_()
+void Widget::freeChild()
 {
-    for (Widget* widget : children_)
+    if (child_)
     {
-        widget->~Widget();
-        allocator_.free(widget);
+        child_->~Widget();
+        allocator_.free(child_);
     }
 }
 
