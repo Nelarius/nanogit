@@ -1,7 +1,10 @@
 #pragma once
 
 #include "nlrsGeometry.h"
+#include "nlrsMemory.h"
 #include "core/nlrsMouse.h"
+
+#include <utility>
 
 struct NVGcontext;
 
@@ -12,11 +15,12 @@ class Widget
 {
 public:
     Widget(Widget* parent, IAllocator& allocator);
-    virtual ~Widget();
+    virtual ~Widget() = default;
 
     virtual void onRender() = 0;
     virtual void onMouseButton(Mouse::Button button, Mouse::Event event, Vec2i coordinates);
     virtual void onMouseScroll(i32 delta, Vec2i coordinates);
+    virtual void onMouseOver(Vec2i coordinates);
     // the default implementation just returns the parent's context
     virtual NVGcontext* context();
 
@@ -25,15 +29,19 @@ public:
     // by this widget's margin, padding, and border
     virtual Bounds2i contentBounds() const;
 
+    // Construct and add a child using the default Widget constructor
     template<typename T>
-    T* addChild()
+    T& addChild()
     {
-        void* mem = allocator_.allocate(sizeof(T), sizeof(T));
-        T* widget = new (mem) T(static_cast<Widget*>(this), allocator_);
+        child_ = makeScopedPtrForBaseClass<Widget, T>(allocator_, this, allocator_);
+        return *dynamic_cast<T*>(child_.get());
+    }
 
-        child_ = widget;
-
-        return widget;
+    template<typename T>
+    T& addChild(ScopedPtr<Widget>&& child)
+    {
+        child_ = std::move(child);
+        return *dynamic_cast<T*>(child_.get());
     }
 
     void setMargin(int margin);
@@ -41,11 +49,10 @@ public:
     void setPadding(int padding);
 
 protected:
-    void freeChild();
 
     IAllocator& allocator_;
     Widget* parent_;
-    Widget* child_;
+    ScopedPtr<Widget> child_;
     NVGcontext* context_;
 
     // element information

@@ -40,15 +40,15 @@ bool App::initialize()
     IAllocator& allocator = SystemAllocator::getInstance();
 
     screen_.setPadding(50);
-    ScrollPanel* scrollPanel = screen_.addChild<ScrollPanel>();
-    scrollPanel->setRadius(5.f);
-    scrollPanel->setFeather(5.f);
-    scrollPanel->setScrollBarWidth(16);
-    TextBox* textBox = scrollPanel->addChild<TextBox>();
+    ScrollPanel& scrollPanel = screen_.addChild<ScrollPanel>();
+    scrollPanel.setRadius(5.f);
+    scrollPanel.setFeather(5.f);
+    scrollPanel.setScrollBarWidth(16);
+    TextBox& textBox = scrollPanel.addChild<TextBox>();
 
-    textBox->setFont(handle);
-    textBox->setFontSize(18.f);
-    textBox->setText(repository_.diffIndexToWorkDir().c_str());
+    textBox.setFont(handle);
+    textBox.setFontSize(18.f);
+    textBox.setText(repository_.diffIndexToWorkDir().c_str());
 
     Mouse& mouse = *MouseLocator::get();
     mouse.listenToButtonDown([this](Mouse::Button button, Vec2i coords) -> void {

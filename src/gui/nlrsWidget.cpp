@@ -8,7 +8,7 @@ namespace nlrs
 Widget::Widget(Widget* parent, IAllocator& allocator)
     : allocator_(allocator),
     parent_(parent),
-    child_(nullptr),
+    child_(allocator),
     margin_(0),
     border_(0),
     padding_(0)
@@ -17,12 +17,6 @@ Widget::Widget(Widget* parent, IAllocator& allocator)
     {
         context_ = parent->context();
     }
-}
-
-Widget::~Widget()
-{
-    // TODO: use smart pointer here
-    freeChild();
 }
 
 void Widget::onMouseButton(Mouse::Button button, Mouse::Event event, Vec2i coordinates)
@@ -43,6 +37,17 @@ void Widget::onMouseScroll(i32 delta, Vec2i coordinates)
         if (child_)
         {
             child_->onMouseScroll(delta, coordinates);
+        }
+    }
+}
+
+void Widget::onMouseOver(Vec2i coordinates)
+{
+    if (contentBounds().contains(coordinates))
+    {
+        if (child_)
+        {
+            child_->onMouseOver(coordinates);
         }
     }
 }
@@ -91,13 +96,5 @@ Bounds2i Widget::contentBounds() const
     return bounds.shrink(i32(margin_ + border_ + padding_));
 }
 
-void Widget::freeChild()
-{
-    if (child_)
-    {
-        child_->~Widget();
-        allocator_.free(child_);
-    }
-}
 
 }
