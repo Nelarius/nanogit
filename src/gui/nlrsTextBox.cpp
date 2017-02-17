@@ -30,7 +30,7 @@ void TextBox::onRender()
     const char* start = text_.c_str();
     const char* end = start + text_.length();
 
-    while (nrows = nvgTextBreakLines(context_, start, end, float(extent.x), rows, 3))
+    while ((nrows = nvgTextBreakLines(context_, start, end, float(extent.x), rows, 3)))
     {
         for (int i = 0; i < nrows; ++i)
         {
