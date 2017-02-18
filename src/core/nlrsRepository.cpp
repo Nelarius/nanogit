@@ -1,3 +1,4 @@
+#include "nlrsAssert.h"
 #include "nlrsRepository.h"
 #include "nlrsGitUtil.h"
 #include "nlrsAliases.h"
@@ -5,6 +6,40 @@
 #include <cstdio>
 #include <cstring>
 #include <utility>
+
+namespace
+{
+
+class GitGlobal
+{
+public:
+    static void init()
+    {
+        NLRS_ASSERT(references_ >= 0);
+        if (references_ == 0)
+        {
+            git_libgit2_init();
+        }
+        ++references_;
+    }
+
+    static void shutdown()
+    {
+        --references_;
+        if (references_ == 0)
+        {
+            git_libgit2_shutdown();
+        }
+        NLRS_ASSERT(references_ >= 0);
+    }
+
+private:
+    static int references_;
+};
+
+int GitGlobal::references_ = 0;
+
+}
 
 namespace nlrs
 {
@@ -124,6 +159,7 @@ Repository::Repository(const char* pathToRepository)
     : repository_(nullptr),
     log_()
 {
+    GitGlobal::init();
     checkError(git_repository_open(&repository_, pathToRepository), "Failed to open repository");
     constructLog_();
 }
@@ -138,6 +174,7 @@ Repository::Repository(Repository&& other)
 Repository::~Repository()
 {
     close();
+    GitGlobal::shutdown();
 }
 
 void Repository::close()

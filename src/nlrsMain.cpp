@@ -8,7 +8,6 @@
 #include "nlrsWindow.h"
 
 #include "SDL_events.h"
-#include "git2.h"
 
 #include <cstdlib>
 
@@ -20,8 +19,6 @@ using nlrs::u32;
 
 int main(int argc, char** argv)
 {
-    git_libgit2_init();
-
     /***
     *       _______  __       _      ___         __             _      _ __
     *      / __/ _ \/ /      | | /| / (_)__  ___/ /__ _    __  (_)__  (_) /_
@@ -145,7 +142,6 @@ int main(int argc, char** argv)
         }
     }
 
-    git_libgit2_shutdown();
 
     return 0;
 }
