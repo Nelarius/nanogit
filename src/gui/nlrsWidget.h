@@ -27,7 +27,7 @@ public:
     // the screen space bounds of the widget content
     // the default implementation offsets the parent's content bounds
     // by this widget's margin, padding, and border
-    virtual Bounds2i contentBounds() const;
+    virtual Bounds2f contentBounds() const;
 
     // Construct and add a child using the default Widget constructor
     template<typename T>
@@ -44,9 +44,9 @@ public:
         return *dynamic_cast<T*>(child_.get());
     }
 
-    void setMargin(int margin);
-    void setBorder(int border);
-    void setPadding(int padding);
+    void setMargin(float margin);
+    void setBorder(float border);
+    void setPadding(float padding);
 
 protected:
 
@@ -56,9 +56,9 @@ protected:
     NVGcontext* context_;
 
     // element information
-    int margin_;
-    int border_;
-    int padding_;
+    float margin_;
+    float border_;
+    float padding_;
 };
 
 }

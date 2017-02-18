@@ -9,9 +9,9 @@ Widget::Widget(Widget* parent, IAllocator& allocator)
     : allocator_(allocator),
     parent_(parent),
     child_(allocator),
-    margin_(0),
-    border_(0),
-    padding_(0)
+    margin_(0.f),
+    border_(0.f),
+    padding_(0.f)
 {
     if (parent)
     {
@@ -21,7 +21,7 @@ Widget::Widget(Widget* parent, IAllocator& allocator)
 
 void Widget::onMouseButton(Mouse::Button button, Mouse::Event event, Vec2i coordinates)
 {
-    if (contentBounds().contains(coordinates))
+    if (contentBounds().contains(coordinates.cast<float>()))
     {
         if (child_)
         {
@@ -32,7 +32,7 @@ void Widget::onMouseButton(Mouse::Button button, Mouse::Event event, Vec2i coord
 
 void Widget::onMouseScroll(i32 delta, Vec2i coordinates)
 {
-    if (contentBounds().contains(coordinates))
+    if (contentBounds().contains(coordinates.cast<float>()))
     {
         if (child_)
         {
@@ -43,7 +43,7 @@ void Widget::onMouseScroll(i32 delta, Vec2i coordinates)
 
 void Widget::onMouseOver(Vec2i coordinates)
 {
-    if (contentBounds().contains(coordinates))
+    if (contentBounds().contains(coordinates.cast<float>()))
     {
         if (child_)
         {
@@ -52,7 +52,7 @@ void Widget::onMouseOver(Vec2i coordinates)
     }
 }
 
-void Widget::setMargin(int margin)
+void Widget::setMargin(float margin)
 {
     if (margin < 0)
     {
@@ -63,7 +63,7 @@ void Widget::setMargin(int margin)
     margin_ = margin;
 }
 
-void Widget::setBorder(int border)
+void Widget::setBorder(float border)
 {
     if (border < 0)
     {
@@ -74,7 +74,7 @@ void Widget::setBorder(int border)
     border_ = border;
 }
 
-void Widget::setPadding(int padding)
+void Widget::setPadding(float padding)
 {
     if (padding < 0)
     {
@@ -89,11 +89,11 @@ NVGcontext* Widget::context()
     return parent_->context();
 }
 
-Bounds2i Widget::contentBounds() const
+Bounds2f Widget::contentBounds() const
 {
     // TODO: validate the calculated size
     auto bounds = parent_->contentBounds();
-    return bounds.shrink(i32(margin_ + border_ + padding_));
+    return bounds.shrink(margin_ + border_ + padding_);
 }
 
 

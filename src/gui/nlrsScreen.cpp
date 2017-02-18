@@ -54,9 +54,9 @@ NVGcontext* Screen::context()
     return context_;
 }
 
-Bounds2i Screen::contentBounds() const
+Bounds2f Screen::contentBounds() const
 {
-    return Bounds2i({0, 0}, {size_.x, size_.y}).shrink(padding_);
+    return Bounds2f({0.f, 0.f}, {float(size_.x), float(size_.y)}).shrink(padding_);
 }
 
 void Screen::onRender()

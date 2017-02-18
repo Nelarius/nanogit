@@ -8,13 +8,13 @@ namespace nlrs
 
 void ScrollPanel::onRender()
 {
-    Bounds2i b = contentBounds();
-    Vec2i extent = b.extent();
+    Bounds2f b = contentBounds();
+    Vec2f extent = b.extent();
 
-    float x = float(b.min.x);
-    float y = float(b.min.y);
-    float w = float(extent.x);
-    float h = float(extent.y);
+    float x = b.min.x;
+    float y = b.min.y;
+    float w = extent.x;
+    float h = extent.y;
 
     // render the scroll bar
 
@@ -23,7 +23,7 @@ void ScrollPanel::onRender()
         context_, x + w - scrollBarWidth_ + 1.f, y + 1.f, scrollBarWidth_ + 1.f,
         h, radius_, feather_, nvgRGB(128, 128, 128), nvgRGB(64, 64, 64));
     nvgBeginPath(context_);
-    nvgRoundedRect(context_, x + w - float(scrollBarWidth_), y, float(scrollBarWidth_),
+    nvgRoundedRect(context_, x + w - scrollBarWidth_, y, scrollBarWidth_,
         h, radius_);
     nvgFillPaint(context_, paint);
     nvgFill(context_);
@@ -31,16 +31,16 @@ void ScrollPanel::onRender()
     float scrollh = h;
     if (child_)
     {
-        float childHeight = child_->contentBounds().extent().cast<float>().y;
+        float childHeight = child_->contentBounds().extent().y;
         scrollh = h * (h / childHeight);
     }
 
     paint = nvgBoxGradient(
         context_, x + w - scrollBarWidth_ - 1.f, y + (h - scrollh) * scrollPosition_,
-        float(scrollBarWidth_), scrollh, radius_, feather_, nvgRGB(220, 220, 220), nvgRGB(128, 128, 128));
+        scrollBarWidth_, scrollh, radius_, feather_, nvgRGB(220, 220, 220), nvgRGB(128, 128, 128));
     nvgBeginPath(context_);
     nvgRoundedRect(
-        context_, x + w - float(scrollBarWidth_) + 1.f, y + 1.f + (h - scrollh) * scrollPosition_,
+        context_, x + w - scrollBarWidth_ + 1.f, y + 1.f + (h - scrollh) * scrollPosition_,
         scrollBarWidth_ - 1.f, scrollh - 1.f, radius_ - 1.f);
     nvgFillPaint(context_, paint);
     nvgFill(context_);
@@ -54,7 +54,7 @@ void ScrollPanel::onRender()
     if (child_)
     {
         auto b = child_->contentBounds();
-        float childHeight = b.extent().cast<float>().y + 0.5f * contentBounds().extent().y;
+        float childHeight = b.extent().y;
 
         nvgTranslate(context_, 0.f, -childHeight * scrollPosition_);
     }

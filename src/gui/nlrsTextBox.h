@@ -23,7 +23,7 @@ public:
 
     void onRender() override;
 
-    Bounds2i contentBounds() const override;
+    Bounds2f contentBounds() const override;
 
     void setText(const char* text);
     void setFont(FontManager::Handle font);
@@ -34,7 +34,7 @@ private:
     FontManager::Handle font_;
     float fontSize_;
 
-    Bounds2i contentBounds_;
+    Bounds2f contentBounds_;
 };
 
 }

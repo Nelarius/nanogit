@@ -26,7 +26,7 @@ void TextBox::onRender()
 
     NVGtextRow rows[3];
     int nrows = 0;
-    Vec2f linePos{ float(b.min.x), float(b.min.y) };
+    Vec2f linePos{ b.min.x, b.min.y };
     const char* start = text_.c_str();
     const char* end = start + text_.length();
 
@@ -42,7 +42,7 @@ void TextBox::onRender()
     }
 }
 
-Bounds2i TextBox::contentBounds() const
+Bounds2f TextBox::contentBounds() const
 {
     if (text_.length() == 0)
     {
@@ -58,8 +58,11 @@ void TextBox::setText(const char* text)
 {
     text_ = text;
 
-    Bounds2f fbounds = parent_->contentBounds().cast<float>();
-    fbounds.shrink(float(padding_ + margin_ + border_));
+    nvgFontFaceId(context_, font_);
+    nvgFontSize(context_, fontSize_);
+
+    Bounds2f fbounds = parent_->contentBounds();
+    fbounds.shrink(padding_ + margin_ + border_);
     Vec2f extent = fbounds.extent();
 
     const char* start = text_.c_str();
@@ -67,12 +70,12 @@ void TextBox::setText(const char* text)
 
     nvgTextBoxBounds(context_, fbounds.min.x, fbounds.min.y, extent.x, start, end, &fbounds.min.x);
 
-    contentBounds_ = Bounds2i(
-        Vec2i{i32(std::ceil(fbounds.min.x)), i32(std::ceil(fbounds.min.y))},
-        Vec2i{i32(std::ceil(fbounds.max.x)), i32(std::ceil(fbounds.max.y))}
+    contentBounds_ = Bounds2f(
+        Vec2f{ fbounds.min.x, fbounds.min.y },
+        Vec2f { fbounds.max.x, fbounds.max.y }
     );
 
-    contentBounds_ = contentBounds_.shrink(i32(padding_ + margin_ + border_));
+    contentBounds_ = contentBounds_.shrink(padding_ + margin_ + border_);
 }
 
 void TextBox::setFont(FontManager::Handle handle)

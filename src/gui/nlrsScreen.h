@@ -26,7 +26,7 @@ public:
 
     void onRender() override;
     NVGcontext* context() override;
-    Bounds2i contentBounds() const override;
+    Bounds2f contentBounds() const override;
 
 private:
     NVGcontext* context_;
