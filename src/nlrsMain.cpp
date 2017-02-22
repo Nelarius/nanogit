@@ -14,8 +14,8 @@
 using nlrs::usize;
 using nlrs::u32;
 
-#define WINDOW_WIDTH 1000
-#define WINDOW_HEIGHT 800
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
 
 int main(int argc, char** argv)
 {
@@ -141,7 +141,6 @@ int main(int argc, char** argv)
             renderer.swapBuffers();
         }
     }
-
 
     return 0;
 }

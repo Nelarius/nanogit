@@ -8,13 +8,12 @@ namespace nlrs
 
 void ScrollPanel::onRender()
 {
-    Bounds2f b = contentBounds();
-    Vec2f extent = b.extent();
+    Bounds2f b = Bounds2f(position_, position_ + size_);
 
     float x = b.min.x;
     float y = b.min.y;
-    float w = extent.x;
-    float h = extent.y;
+    float w = size_.x;
+    float h = size_.y;
 
     // render the scroll bar
 
@@ -31,7 +30,7 @@ void ScrollPanel::onRender()
     float scrollh = h;
     if (child_)
     {
-        float childHeight = child_->contentBounds().extent().y;
+        float childHeight = child_->size().y;
         scrollh = h * (h / childHeight);
     }
 
@@ -53,10 +52,7 @@ void ScrollPanel::onRender()
 
     if (child_)
     {
-        auto b = child_->contentBounds();
-        float childHeight = b.extent().y;
-
-        nvgTranslate(context_, 0.f, -childHeight * scrollPosition_);
+        nvgTranslate(context_, 0.f, -child_->size().y * scrollPosition_);
     }
 
     child_->onRender();

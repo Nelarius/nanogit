@@ -15,7 +15,9 @@ namespace nlrs
 Screen::Screen(IAllocator& allocator)
     : Widget(nullptr, allocator),
     context_(nullptr)
-{}
+{
+    position_ = Vec2f(0.f, 0.f);
+}
 
 Screen::~Screen()
 {
@@ -34,7 +36,8 @@ Screen::Screen(Screen&& other)
 
 bool Screen::initialize(Vec2i windowSize)
 {
-    size_ = windowSize;
+    size_ = windowSize.cast<float>();
+
 #ifdef NLRS_DEBUG
     context_ = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
 #else
@@ -54,27 +57,29 @@ NVGcontext* Screen::context()
     return context_;
 }
 
-Bounds2f Screen::contentBounds() const
-{
-    return Bounds2f({0.f, 0.f}, {float(size_.x), float(size_.y)}).shrink(padding_);
-}
-
 void Screen::onRender()
 {
     NLRS_ASSERT(context_);
 
-    nvgBeginFrame(context_, size_.x, size_.y, float(size_.x) / size_.y);
+    // TODO: calculate pixel ratio
+    float pixelRatio = 1.f;
 
-    child_->onRender();
+    nvgSave(context_);
+    {
+        nvgBeginFrame(context_, int(size_.x), int(size_.y), pixelRatio);
 
-    nvgEndFrame(context_);
+        child_->onRender();
+
+        nvgEndFrame(context_);
+    }
+    nvgRestore(context_);
 }
 
 void Screen::onResize(Vec2i newSize)
 {
     NLRS_ASSERT(context_);
 
-    size_ = newSize;
+    size_ = newSize.cast<float>();
 }
 
 }

@@ -1,7 +1,9 @@
 #include "nlrsAllocator.h"
 #include "nlrsApp.h"
+#include "nlrsLog.h"
 #include "nlrsMouse.h"
 #include "nlrsWindow.h"
+#include "gui/nlrsButton.h"
 #include "gui/nlrsScrollPanel.h"
 #include "gui/nlrsTextBox.h"
 
@@ -39,16 +41,27 @@ bool App::initialize()
 
     IAllocator& allocator = SystemAllocator::getInstance();
 
-    screen_.setPadding(50);
     ScrollPanel& scrollPanel = screen_.addChild<ScrollPanel>();
     scrollPanel.setRadius(5.f);
     scrollPanel.setFeather(5.f);
     scrollPanel.setScrollBarWidth(16);
-    TextBox& textBox = scrollPanel.addChild<TextBox>();
+    scrollPanel.setPosition(Vec2f(0.f, 0.f));
+    auto& size = screen_.size();
+    scrollPanel.setSize(Vec2f(size.x, size.y - 50.f));
 
+    TextBox& textBox = scrollPanel.addChild<TextBox>();
     textBox.setFont(handle);
     textBox.setFontSize(18.f);
     textBox.setText(repository_.diffIndexToWorkDir().c_str());
+
+    /*Button& button = screen_.addChild<Button>();
+    float buttonWidth = 100.f;
+    button.setPosition(Vec2f(0.5f * (size.x - buttonWidth), size.y - 50.f));
+    button.setSize(Vec2f(buttonWidth, 50));
+    button.setText("button");
+    button.setFont(handle);
+    button.setFontSize(24.f);
+    button.setCallback([]() -> void { LOG_INFO << "The button was pressed!"; });*/
 
     Mouse& mouse = *MouseLocator::get();
     mouse.listenToButtonDown([this](Mouse::Button button, Vec2i coords) -> void {

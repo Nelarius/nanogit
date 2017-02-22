@@ -42,18 +42,6 @@ void TextBox::onRender()
     }
 }
 
-Bounds2f TextBox::contentBounds() const
-{
-    if (text_.length() == 0)
-    {
-        return parent_->contentBounds();
-    }
-    else
-    {
-        return contentBounds_;
-    }
-}
-
 void TextBox::setText(const char* text)
 {
     text_ = text;
@@ -61,21 +49,20 @@ void TextBox::setText(const char* text)
     nvgFontFaceId(context_, font_);
     nvgFontSize(context_, fontSize_);
 
-    Bounds2f fbounds = parent_->contentBounds();
-    fbounds.shrink(padding_ + margin_ + border_);
+    Bounds2f fbounds = Bounds2f(parent_->position(), parent_->position() + parent_->size());
+
     Vec2f extent = fbounds.extent();
 
     const char* start = text_.c_str();
     const char* end = start + text_.length();
 
     nvgTextBoxBounds(context_, fbounds.min.x, fbounds.min.y, extent.x, start, end, &fbounds.min.x);
+    size_ = fbounds.extent();
 
     contentBounds_ = Bounds2f(
         Vec2f{ fbounds.min.x, fbounds.min.y },
         Vec2f { fbounds.max.x, fbounds.max.y }
     );
-
-    contentBounds_ = contentBounds_.shrink(padding_ + margin_ + border_);
 }
 
 void TextBox::setFont(FontManager::Handle handle)

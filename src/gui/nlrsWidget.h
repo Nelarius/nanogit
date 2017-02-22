@@ -21,13 +21,14 @@ public:
     virtual void onMouseButton(Mouse::Button button, Mouse::Event event, Vec2i coordinates);
     virtual void onMouseScroll(i32 delta, Vec2i coordinates);
     virtual void onMouseOver(Vec2i coordinates);
+
     // the default implementation just returns the parent's context
     virtual NVGcontext* context();
 
     // the screen space bounds of the widget content
     // the default implementation offsets the parent's content bounds
     // by this widget's margin, padding, and border
-    virtual Bounds2f contentBounds() const;
+    /*virtual Bounds2f contentBounds() const;*/
 
     // Construct and add a child using the default Widget constructor
     template<typename T>
@@ -44,21 +45,21 @@ public:
         return *dynamic_cast<T*>(child_.get());
     }
 
-    void setMargin(float margin);
-    void setBorder(float border);
-    void setPadding(float padding);
+    inline Vec2f position() const { return position_; }
+    inline void setPosition(Vec2f pos) { NLRS_ASSERT(pos.x >= 0.f && pos.y >= 0.f); position_ = pos;}
+
+    inline Vec2f size() const { return size_; }
+    inline void setSize(Vec2f size) { NLRS_ASSERT(size.x >= 0.f && size.y >= 0.f); size_ = size; }
 
 protected:
-
     IAllocator& allocator_;
     Widget* parent_;
     ScopedPtr<Widget> child_;
     NVGcontext* context_;
 
     // element information
-    float margin_;
-    float border_;
-    float padding_;
+    Vec2f position_; // the position relative to the parent
+    Vec2f size_; // the extents of the widget
 };
 
 }

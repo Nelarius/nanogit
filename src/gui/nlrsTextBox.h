@@ -23,8 +23,6 @@ public:
 
     void onRender() override;
 
-    Bounds2f contentBounds() const override;
-
     void setText(const char* text);
     void setFont(FontManager::Handle font);
     void setFontSize(float size);

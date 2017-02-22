@@ -26,11 +26,9 @@ public:
 
     void onRender() override;
     NVGcontext* context() override;
-    Bounds2f contentBounds() const override;
 
 private:
     NVGcontext* context_;
-    Vec2i size_;
 };
 
 }
