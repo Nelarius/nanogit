@@ -54,14 +54,14 @@ bool App::initialize()
     textBox.setFontSize(18.f);
     textBox.setText(repository_.diffIndexToWorkDir().c_str());
 
-    /*Button& button = screen_.addChild<Button>();
+    Button& button = screen_.addChild<Button>();
     float buttonWidth = 100.f;
     button.setPosition(Vec2f(0.5f * (size.x - buttonWidth), size.y - 50.f));
     button.setSize(Vec2f(buttonWidth, 50));
     button.setText("button");
     button.setFont(handle);
     button.setFontSize(24.f);
-    button.setCallback([]() -> void { LOG_INFO << "The button was pressed!"; });*/
+    button.setCallback([]() -> void { LOG_INFO << "The button was pressed!"; });
 
     Mouse& mouse = *MouseLocator::get();
     mouse.listenToButtonDown([this](Mouse::Button button, Vec2i coords) -> void {

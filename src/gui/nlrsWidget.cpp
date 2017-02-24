@@ -8,7 +8,7 @@ namespace nlrs
 Widget::Widget(Widget* parent, IAllocator& allocator)
     : allocator_(allocator),
     parent_(parent),
-    child_(allocator)
+    children_(allocator)
 {
     if (parent)
     {
@@ -20,9 +20,9 @@ void Widget::onMouseButton(Mouse::Button button, Mouse::Event event, Vec2i coord
 {
     if (Bounds2f(position_, position_ + size_).contains(coordinates.cast<float>()))
     {
-        if (child_)
+        for (auto& child : children_)
         {
-            child_->onMouseButton(button, event, coordinates);
+            child->onMouseButton(button, event, coordinates);
         }
     }
 }
@@ -31,9 +31,9 @@ void Widget::onMouseScroll(i32 delta, Vec2i coordinates)
 {
     if (Bounds2f(position_, position_ + size_).contains(coordinates.cast<float>()))
     {
-        if (child_)
+        for (auto& child : children_)
         {
-            child_->onMouseScroll(delta, coordinates);
+            child->onMouseScroll(delta, coordinates);
         }
     }
 }
@@ -42,9 +42,9 @@ void Widget::onMouseOver(Vec2i coordinates)
 {
     if (Bounds2f(position_, position_ + size_).contains(coordinates.cast<float>()))
     {
-        if (child_)
+        for (auto& child : children_)
         {
-            child_->onMouseOver(coordinates);
+            child->onMouseOver(coordinates);
         }
     }
 }

@@ -68,7 +68,10 @@ void Screen::onRender()
     {
         nvgBeginFrame(context_, int(size_.x), int(size_.y), pixelRatio);
 
-        child_->onRender();
+        for (auto& child : children_)
+        {
+            child->onRender();
+        }
 
         nvgEndFrame(context_);
     }

@@ -25,24 +25,19 @@ public:
     // the default implementation just returns the parent's context
     virtual NVGcontext* context();
 
-    // the screen space bounds of the widget content
-    // the default implementation offsets the parent's content bounds
-    // by this widget's margin, padding, and border
-    /*virtual Bounds2f contentBounds() const;*/
-
     // Construct and add a child using the default Widget constructor
     template<typename T>
     T& addChild()
     {
-        child_ = makeScopedPtrForBaseClass<Widget, T>(allocator_, this, allocator_);
-        return *dynamic_cast<T*>(child_.get());
+        auto indx = children_.emplaceBack(makeScopedPtrForBaseClass<Widget, T>(allocator_, this, allocator_));
+        return *dynamic_cast<T*>(children_[indx].get());
     }
 
     template<typename T>
     T& addChild(ScopedPtr<Widget>&& child)
     {
-        child_ = std::move(child);
-        return *dynamic_cast<T*>(child_.get());
+        auto indx = children_.emplaceBack(std::move(child));
+        return *dynamic_cast<T*>(children_[indx].get());
     }
 
     inline Vec2f position() const { return position_; }
@@ -54,7 +49,7 @@ public:
 protected:
     IAllocator& allocator_;
     Widget* parent_;
-    ScopedPtr<Widget> child_;
+    Array<ScopedPtr<Widget>> children_;
     NVGcontext* context_;
 
     // element information

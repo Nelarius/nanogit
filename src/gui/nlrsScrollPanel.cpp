@@ -8,6 +8,16 @@ namespace nlrs
 
 void ScrollPanel::onRender()
 {
+    if (children_.empty())
+    {
+        return;
+    }
+    else if (children_.size() > 1)
+    {
+        LOG_ERROR << "The scroll panel had more than one child!";
+        return;
+    }
+
     Bounds2f b = Bounds2f(position_, position_ + size_);
 
     float x = b.min.x;
@@ -27,12 +37,12 @@ void ScrollPanel::onRender()
     nvgFillPaint(context_, paint);
     nvgFill(context_);
 
+    // TODO:
+    // sum the height of the children
+    Widget& child = *children_[0];
     float scrollh = h;
-    if (child_)
-    {
-        float childHeight = child_->size().y;
-        scrollh = h * (h / childHeight);
-    }
+    float childHeight = child.size().y;
+    scrollh = h * (h / childHeight);
 
     paint = nvgBoxGradient(
         context_, x + w - scrollBarWidth_ - 1.f, y + (h - scrollh) * scrollPosition_,
@@ -50,12 +60,9 @@ void ScrollPanel::onRender()
 
     nvgScissor(context_, x, y, w - scrollBarWidth_, h);
 
-    if (child_)
-    {
-        nvgTranslate(context_, 0.f, -child_->size().y * scrollPosition_);
-    }
+    nvgTranslate(context_, 0.f, -child.size().y * scrollPosition_);
 
-    child_->onRender();
+    child.onRender();
 
     nvgRestore(context_);
 }
