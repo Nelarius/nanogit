@@ -4,7 +4,7 @@
 #include "gui/nlrsScreen.h"
 #include "nlrsAllocator.h"
 #include "nlrsLog.h"
-#include "nlrsRenderer.h"
+#include "nlrsGraphicsApi.h"
 #include "nlrsWindow.h"
 
 #include "SDL_events.h"
@@ -74,17 +74,17 @@ int main(int argc, char** argv)
         *    /_/|_|\__/_//_/\_,_/\__/_/  \__/_/   /_/_//_/_/\__/
         *
         */
-        nlrs::Renderer renderer;
+        nlrs::GraphicsApi graphicsApi;
         {
-            nlrs::Renderer::Options opts;
+            nlrs::GraphicsApi::Options opts;
 
-            if (!renderer.initialize(opts))
+            if (!graphicsApi.initialize(opts))
             {
-                LOG_ERROR << "Failed to initialize renderer.";
+                LOG_ERROR << "Failed to initialize graphics api.";
                 return -1;
             }
         }
-        nlrs::RendererLocator::set(&renderer);
+        nlrs::GraphicsApiLocator::set(&graphicsApi);
 
         /***
         *       ________       __         _           _      _ __
@@ -134,11 +134,11 @@ int main(int argc, char** argv)
 
             app.update();
 
-            renderer.clearBuffers();
+            graphicsApi.clearBuffers();
 
             app.render();
 
-            renderer.swapBuffers();
+            graphicsApi.swapBuffers();
         }
     }
 
